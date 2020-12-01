@@ -174,105 +174,9 @@ void print_time(int n)
 	}
 }
 
-void Priority(int n)
+void Priority_print(int n)
 {
-	int sum=0;
-	int i,j;
-	int time = pcb[1].arrivetime;
-	//按各进程的arrivetime进行升序排列,最早到达的进程先执行
-	for(i=1;i<=n;i++)
-	for(j=i+1;j<=n;j++)  
-	{
-		if(pcb[j].arrivetime < pcb[i].arrivetime)
-		{
-			pcb[0]=pcb[j];
-			pcb[j]=pcb[i];
-			pcb[i]=pcb[0];	
-		}
-	}
-	
-	    //printf("output the sort result: \n"); //输出排序结果
-	    //for(i=1;i<=n;i++)    //检查排序是否正确
-     	//printf("%d\t",pcb[i].name);
-
-	printf("\n processID runtime priority fihishtime \n");//进程名   服务时间   优先级  完成时间
-	//先到达的进程第一个执行
-	pcb[1].finishtime=pcb[1].arrivetime + pcb[1].servicetime;
-	time=pcb[1].arrivetime + pcb[1].servicetime;
-//	printf("%6d%10d%10d%10d",pcb[1].name,pcb[1].servicetime,pcb[1].priority,pcb[1].finishtime);
-	pcb[1].sign = 1;
-	sum=1;
-	printf("\n");
-	int arrNum=0;
-	while(sum < n)
-	{
-		arrNum=0;
-		for(i=2;i<=n;i++)  //判断有几个arrivetime<=time的 
-		{
-			if(pcb[i].sign == 1)
-			{
-				continue;
-			}
-			if(pcb[i].arrivetime <= time)
-			{
-				arrNum++;
-			}
-		}
-		if(arrNum > 0)
-		{
-			for(i=2;i<=n;i++)  //按优先级排序 
-			{
-				for(j=i+1;j<=n;j++)
-				{
-					if(pcb[j].priority > pcb[i].priority)
-					{
-						pcb[0]=pcb[j];
-						pcb[j]=pcb[i];
-						pcb[i]=pcb[0];	
-					}
-				}	
-			}
-			for(i=2;i<=n;i++) //获取优先级最大且 arrivetime<=time 
-			{
-				if(pcb[i].sign==0&&pcb[i].arrivetime<=time)  //进行赋值操作 
-				{
-					pcb[i].finishtime = time + pcb[i].servicetime;
-					pcb[i].sign = 1;
-					sum++;
-					time = time + pcb[i].servicetime;
-					break;
-				}
-			}
-		}
-		else
-		{
-			for(i=2;i<=n;i++)  //按arrivetime顺序排序 
-			{
-				for(j=i+1;j<=n;j++)
-				{
-					if(pcb[j].arrivetime < pcb[i].arrivetime)
-					{
-						pcb[0]=pcb[j];
-						pcb[j]=pcb[i];
-						pcb[i]=pcb[0];	
-					}
-				}	
-			}
-			for(i=2;i<=n;i++) //获取arrivetime最小的 
-			{
-				if(pcb[i].sign==0)  //进行赋值操作 
-				{
-					pcb[i].finishtime = pcb[i].arrivetime + pcb[i].servicetime;
-					pcb[i].sign = 1;
-					sum++;
-					time=pcb[i].arrivetime + pcb[i].servicetime;
-					break;
-				}
-			}
-				
-		}
-	}
-	//开始进行输出
+	int i, j;
 	for(i=1;i<=n;i++)
 	{
 		for(j=i+1;j<=n;j++)  
@@ -291,18 +195,120 @@ void Priority(int n)
 		printf("%6d%10d%10d%10d",pcb[i].name,pcb[i].servicetime,pcb[i].priority,pcb[i].finishtime);
 		printf("\n");
 	}
-}//void
+}
 
-void shortPrior(int n)
+void SortByPriorityOrArrivetime(int flag, int n)
 {
 	int i, j;
-	int sum = 0;
-	int time = 0;
-	for(i = 1; i <= n; i++)  //按arrivetime顺序排序 
+	if(flag == 1)
 	{
-		for(j = i + 1; j <= n; j++)
+		for(i=1;i<=n;i++) 
 		{
-			if(pcb[j].arrivetime < pcb[i].arrivetime)
+			for(j=i+1;j<=n;j++)
+			{
+				if(pcb[j].priority > pcb[i].priority)
+				{
+					pcb[0]=pcb[j];
+					pcb[j]=pcb[i];
+					pcb[i]=pcb[0];	
+				}
+			}	
+		}	
+	}
+	else
+	{
+		for(i=1;i<=n;i++)
+		{
+			for(j=i+1;j<=n;j++)
+			{
+				if(pcb[j].arrivetime < pcb[i].arrivetime)
+				{
+					pcb[0]=pcb[j];
+					pcb[j]=pcb[i];
+					pcb[i]=pcb[0];	
+				}
+			}	
+		}
+	}
+}
+
+void Priority(int n)
+{
+	int sum=0;
+	int i,j;
+	int time = 0;
+	printf("\n processID runtime priority fihishtime \n");//进程名   服务时间   优先级  完成时间
+	int arrNum=0;
+	int k;
+	while(sum < n)
+	{
+		arrNum=0;
+		k=0;
+		for(i=1;i<=n;i++)  //判断是否arrivetime<=time的 
+		{
+			if(pcb[i].sign == 1)
+			{
+				continue;
+			}
+			if(pcb[i].arrivetime <= time)
+			{
+				arrNum++;
+			}
+		}
+		if(arrNum > 0)
+		{
+			//按优先级排序 
+			SortByPriorityOrArrivetime(1, n);
+			for(i=1;i<=n;i++) //获取优先级最大且 arrivetime<=time 
+			{
+				if(pcb[i].sign==0&&pcb[i].arrivetime<=time)  //进行赋值操作 
+				{
+					pcb[i].finishtime = time + pcb[i].servicetime;
+					pcb[i].sign = 1;
+					sum++;
+					time = time + pcb[i].servicetime;
+					break;
+				}
+			}
+		}
+		else
+		{
+			//按arrivetime顺序排序 
+			SortByPriorityOrArrivetime(0, n);
+			//获取arrivetime最小的，且优先级最大
+			for(i=1;i<=n;i++) 
+			{
+				if(pcb[i].sign == 0)
+				{
+					k = i;
+					break;
+				}
+			}
+			for(i=1;i<=n;i++)
+			{
+				if(pcb[i].arrivetime == pcb[k].arrivetime && pcb[i].priority > pcb[k].priority)
+				{
+					k = i;
+				}
+			}
+			pcb[k].finishtime = pcb[k].arrivetime + pcb[k].servicetime;
+			pcb[k].sign = 1;
+			sum++;
+			time=pcb[k].arrivetime + pcb[k].servicetime;			
+		}
+	}
+	//开始进行输出
+	Priority_print(n);
+}//void
+
+void sortByTimeSlice(int n)
+{
+	int i, j;
+	for(i=1;i<=n;i++)   
+	{
+		for(j=i+1;j<=n;j++)
+		{
+			if(pcb[j].servicetime < pcb[i].servicetime)
 			{
 				pcb[0]=pcb[j];
 				pcb[j]=pcb[i];
@@ -310,16 +316,20 @@ void shortPrior(int n)
 			}
 		}	
 	}
-	pcb[1].finishtime = pcb[1].arrivetime + pcb[1].servicetime;
-	time = pcb[1].finishtime;
-	pcb[1].sign = 1;
-	sum++;
-	printf("\n");
+}
+
+void shortPrior(int n)
+{
+	int i, j;
+	int sum = 0;
+	int time = 0;
 	int arrNum=0;
+	int k;
 	while(sum < n)
 	{
+		k = 0;
 		arrNum=0;
-		for(i=2;i<=n;i++)  //判断有几个arrivetime<=time的 
+		for(i=1;i<=n;i++)  //判断有几个arrivetime<=time的 
 		{
 			if(pcb[i].sign == 1)
 			{
@@ -328,23 +338,14 @@ void shortPrior(int n)
 			if(pcb[i].arrivetime <= time)
 			{
 				arrNum++;
+				break;
 			}
 		}
 		if(arrNum > 0)
 		{
-			for(i=2;i<=n;i++)  //按作业长短排序 
-			{
-				for(j=i+1;j<=n;j++)
-				{
-					if(pcb[j].servicetime < pcb[i].servicetime)
-					{
-						pcb[0]=pcb[j];
-						pcb[j]=pcb[i];
-						pcb[i]=pcb[0];	
-					}
-				}	
-			}
-			for(i=2;i<=n;i++) //获取作业最短且 arrivetime<=time 
+			//按作业长短排序
+			sortByTimeSlice(n);
+			for(i=1;i<=n;i++) //获取作业最短且 arrivetime<=time 
 			{
 				if(pcb[i].sign==0&&pcb[i].arrivetime<=time)  //进行赋值操作 
 				{
@@ -358,7 +359,7 @@ void shortPrior(int n)
 		}
 		else
 		{
-			for(i=2;i<=n;i++)  //按arrivetime顺序排序 
+			for(i=1;i<=n;i++)  //按arrivetime顺序排序 
 			{
 				for(j=i+1;j<=n;j++)
 				{
@@ -370,39 +371,30 @@ void shortPrior(int n)
 					}
 				}
 			}
-			for(i=2;i<=n;i++) //获取arrivetime最小的 
+			//获取arrivetime最小的，且时间片最短 
+			for(i=1;i<=n;i++) 
 			{
-				if(pcb[i].sign==0)  //进行赋值操作 
+				if(pcb[i].sign == 0)
 				{
-					pcb[i].finishtime = pcb[i].arrivetime + pcb[i].servicetime;
-					pcb[i].sign = 1;
-					sum++;
-					time=pcb[i].arrivetime + pcb[i].servicetime;
+					k = i;
 					break;
 				}
 			}
-				
+			for(i=1;i<=n;i++)
+			{
+				if(pcb[i].arrivetime == pcb[k].arrivetime && pcb[i].servicetime > pcb[k].servicetime)
+				{
+					k = i;
+				}
+			}
+			pcb[k].finishtime = pcb[k].arrivetime + pcb[k].servicetime;
+			pcb[k].sign = 1;
+			sum++;
+			time=pcb[k].arrivetime + pcb[k].servicetime;		
 		}
 	}
 	//开始进行输出
-	for(i=1;i<=n;i++)
-	{
-		for(j=i+1;j<=n;j++)  
-		{
-			if(pcb[j].name < pcb[i].name)
-			{
-				pcb[0]=pcb[j];
-				pcb[j]=pcb[i];
-				pcb[i]=pcb[0];	
-			}
-		}
-	}
-	for(i=1;i<=n;i++)
-	{
-		printf("\n processID servicetime priority finishtime\n");  //进程名   服务时间    优先级  完成时间
-		printf("%6d%10d%10d%10d",pcb[i].name,pcb[i].servicetime,pcb[i].priority,pcb[i].finishtime);
-		printf("\n");
-	}
+	Priority_print(n); 
 }
 
 void layout(int n)
